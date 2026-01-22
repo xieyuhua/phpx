@@ -1,15 +1,35 @@
 #!/bin/bash
 # 便携式 PHP 启动脚本
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# DIR="$(dirname "$SCRIPT_DIR")"
 
-# 设置库路径 - 假设库在 DIR/lib 或 DIR/libs
-export LD_LIBRARY_PATH="$DIR/lib:$DIR/libs:$LD_LIBRARY_PATH"
+# 获取脚本的真实路径（处理软链接）
+get_real_path() {
+    # 获取调用脚本的路径
+    local source="${BASH_SOURCE[0]}"
+    local dir=""
+    
+    # 解析软链接
+    while [ -h "$source" ]; do
+        dir="$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )"
+        source="$(readlink "$source")"
+        # 如果是相对链接，转换为绝对路径
+        [[ $source != /* ]] && source="$dir/$source"
+    done
+    
+    # 返回脚本的绝对路径
+    echo "$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )"
+}
+
+# 获取脚本所在目录
+SCRIPT_DIR="$(get_real_path)"
+
+
+# 设置库路径 - 假设库在 DIR/lib 或 SCRIPT_DIR/libs
+export LD_LIBRARY_PATH="$SCRIPT_DIR/lib:$SCRIPT_DIR/libs:$LD_LIBRARY_PATH"
 
 # 在启动脚本中设置扩展目录
-export PHP_EXTENSION_DIR="$DIR/extensions"
+export PHP_EXTENSION_DIR="$SCRIPT_DIR/extensions"
 
 # 设置 PHP 额外配置目录（可选）
-# export PHP_INI_SCAN_DIR="$DIR/etc/conf.d"
+# export PHP_INI_SCAN_DIR="$SCRIPT_DIR/etc/conf.d"
 # 执行 PHP
-exec "$DIR/phpx" -c "$DIR/etc/phpx.ini" "$@"
+exec "$SCRIPT_DIR/phpx" -c "$SCRIPT_DIR/etc/phpx.ini" "$@"
