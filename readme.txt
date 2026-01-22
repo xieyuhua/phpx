@@ -37,7 +37,7 @@ exphpx --ri redis
 
 # 更新软链接
 sudo rm -f /usr/bin/exphpx
-sudo ln -s /www/php/swoole-jobs-pack/bin/exphpx /usr/bin/exphpx
+sudo ln -s /path/to/your/exphpx /usr/bin/exphpx
 
 # 测试
 exphpx -v
