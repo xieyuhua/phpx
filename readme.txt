@@ -45,8 +45,7 @@ exphpx -v
 
 
 
-
-
+ldd /www/server/php/72/sbin/php-fpm | awk '{print $3}' | grep -v "^$" | xargs -I {} cp {} php72/libs/ 2>/dev/null || true
 
 
 [root@tools bin]# ./php-fpm -t -y etc/php-fpm.conf 
