@@ -46,3 +46,40 @@ exphpx -v
 
 
 
+
+
+
+[root@tools bin]# ./php-fpm -t -y etc/php-fpm.conf 
+
+[root@tools bin]# ./php-fpm -y etc/php-fpm.conf 
+[23-Jan-2026 11:14:49] ERROR: An another FPM instance seems to already listen on /tmp/php-cgi-27.sock
+[23-Jan-2026 11:14:49] ERROR: FPM initialization failed
+
+
+[root@tools bin]# ./php-fpm  -F -y etc/php-fpm.conf
+[23-Jan-2026 11:22:06] NOTICE: fpm is running, pid 22354
+[23-Jan-2026 11:22:06] NOTICE: ready to handle connections
+
+#SSL-END
+location /api {
+  index index.php;
+  alias /www/wwwroot/test.com/public/;
+  
+  # 重写
+  if (!-e $request_filename) {  
+      	rewrite  ^/api/(.*)$  /api/index.php?s=$1  last;   break;
+  }
+  
+  #php 解析器
+  location ~ \.php$ {
+      include fastcgi_params;  
+      fastcgi_split_path_info ^(.+\.php)(/.+)$;  
+      fastcgi_pass unix:/tmp/php-cgi-27.sock; 
+      fastcgi_index index.php;  
+      fastcgi_param SCRIPT_FILENAME $request_filename; 
+  }
+}
+
+
+
+
